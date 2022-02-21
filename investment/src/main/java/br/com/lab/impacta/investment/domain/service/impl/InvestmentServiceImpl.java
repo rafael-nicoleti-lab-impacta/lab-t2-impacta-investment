@@ -1,9 +1,12 @@
 package br.com.lab.impacta.investment.domain.service.impl;
 
+import br.com.lab.impacta.investment.domain.exception.InvestmentAccountWithoutBalanceException;
 import br.com.lab.impacta.investment.domain.exception.InvestmentProductNotFoundException;
 import br.com.lab.impacta.investment.domain.model.Investment;
 import br.com.lab.impacta.investment.domain.model.Product;
 import br.com.lab.impacta.investment.domain.service.InvestmentService;
+import br.com.lab.impacta.investment.domain.service.facade.AccountFacade;
+import br.com.lab.impacta.investment.domain.service.facade.valueObject.AccountBalanceVO;
 import br.com.lab.impacta.investment.infrastructure.repository.InvestmentRepository;
 import br.com.lab.impacta.investment.infrastructure.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +24,20 @@ public class InvestmentServiceImpl implements InvestmentService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private AccountFacade accountFacade;
+
     @Value("${lab.investment.exceptions.product-dont-exists-message}")
     private String messageExceptionProductNotFound;
 
     @Value("${lab.investment.exceptions.product-dont-exists-description}")
     private String descriptionExceptionProductNotFound;
+
+    @Value("${lab.investment.exceptions.account-without-balance-message}")
+    private String messageExceptionAccountWithoutBalance;
+
+    @Value("${lab.investment.exceptions.account-without-balance-description}")
+    private String descriptionExceptionAccountWithoutBalance;
 
     @Override
     public Investment invest(Long productId, Long accountId, Double valueInvestment) {
@@ -38,7 +50,12 @@ public class InvestmentServiceImpl implements InvestmentService {
 
         Investment investment = new Investment(productId, accountId, valueInvestment);
 
-//        investment.sufficientBalanceForInvestment(???????)
+        AccountBalanceVO accountBalanceVO = accountFacade.getAccountBalanceById(accountId);
+
+        if (!investment.sufficientBalanceForInvestment(accountBalanceVO.getBalance()))
+            throw new InvestmentAccountWithoutBalanceException(
+                    messageExceptionAccountWithoutBalance,
+                    descriptionExceptionAccountWithoutBalance);
 
         return null;
     }

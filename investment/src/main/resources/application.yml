@@ -37,7 +37,7 @@ lab:
       client-account-balance-path-url: "/api/v1/accounts/{accountId}/balance"
       client-account-debit-path-url: "/api/v1/accounts/{accountId}/debit"
     exceptions:
-      product-dont-exists-message: "Prouto não encontrado."
+      product-dont-exists-message: "Produto não encontrado."
       product-dont-exists-description: "Não foi possível encontrar o produto informado."
       account-without-balance-message: "Saldo insuficiente."
       account-without-balance-description: "Não foi possível efetuar o investimento, o saldo da conta informada é insuficiente."
