@@ -43,5 +43,5 @@ lab:
       account-without-balance-description: "Não foi possível efetuar o investimento, o saldo da conta informada é insuficiente."
       account-without-balance-for-product-private-message: "Produto selecionado não pode ser Private."
       account-without-balance-for-product-private-description: "O produto selecionado é da modalidade Private, porém seus recursos não são compatãveis para esse investimento."
-      account-is-not-debited-message: "N�o foi possível debitar da sua conta corrente."
+      account-is-not-debited-message: "Não foi possível debitar da sua conta corrente."
       account-is-not-debited-description: "Não foi possível efetuar o débito e confirmar seu investimento, tivemos um problema em nossos serviços."
