@@ -1,6 +1,8 @@
 package br.com.lab.impacta.investment.domain.service.impl;
 
+import br.com.lab.impacta.investment.domain.exception.InvestmentAccountIsNotDebitException;
 import br.com.lab.impacta.investment.domain.exception.InvestmentAccountWithoutBalanceException;
+import br.com.lab.impacta.investment.domain.exception.InvestmentAccountWithoutBalanceForProductPrivateException;
 import br.com.lab.impacta.investment.domain.exception.InvestmentProductNotFoundException;
 import br.com.lab.impacta.investment.domain.model.Investment;
 import br.com.lab.impacta.investment.domain.model.Product;
@@ -39,6 +41,18 @@ public class InvestmentServiceImpl implements InvestmentService {
     @Value("${lab.investment.exceptions.account-without-balance-description}")
     private String descriptionExceptionAccountWithoutBalance;
 
+    @Value("${lab.investment.exceptions.account-without-balance-for-product-private-message}")
+    private String messageExceptionAccountWithoutBalanceForProductPrivate;
+
+    @Value("${lab.investment.exceptions.account-without-balance-for-product-private-description}")
+    private String descriptionExceptionAccountWithoutBalanceForProductPrivate;
+
+    @Value("${lab.investment.exceptions.account-is-not-debited-message}")
+    private String messageExceptionAccountIfNotDebited;
+
+    @Value("${lab.investment.exceptions.account-is-not-debited-description}")
+    private String descriptionExceptionAccountIfNotDebited;
+
     @Override
     public Investment invest(Long productId, Long accountId, Double valueInvestment) {
         Optional<Product> product = productRepository.findById(productId);
@@ -57,6 +71,21 @@ public class InvestmentServiceImpl implements InvestmentService {
                     messageExceptionAccountWithoutBalance,
                     descriptionExceptionAccountWithoutBalance);
 
-        return null;
+        if (!investment.verifyProductPrivateOrDefaultForInvestment(accountBalanceVO.getBalance(),
+                product.get()))
+            throw new InvestmentAccountWithoutBalanceForProductPrivateException(
+                    messageExceptionAccountWithoutBalanceForProductPrivate,
+                    descriptionExceptionAccountWithoutBalanceForProductPrivate);
+
+        boolean isDebited = accountFacade.debitAccount(accountId, valueInvestment);
+
+        if (!isDebited)
+            throw new InvestmentAccountIsNotDebitException(
+                    messageExceptionAccountIfNotDebited,
+                    descriptionExceptionAccountIfNotDebited);
+
+        investmentRepository.save(investment);
+
+        return investment;
     }
 }
