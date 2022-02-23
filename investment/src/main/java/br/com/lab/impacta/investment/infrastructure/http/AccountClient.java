@@ -15,7 +15,7 @@ public interface AccountClient {
     @GetMapping("${lab.investment.paths.client-account-balance-path-url}")
     AccountBalanceVO getAccountBalance(@PathVariable("accountId") Long accountId);
 
-    @PostMapping("lab.investment.paths.client-account-debit-path-url")
+    @PostMapping("${lab.investment.paths.client-account-debit-path-url}")
     DebitAccountVO debit(@PathVariable("accountId") Long accountId,
                          DebitAccountRequest debitAccountRequest);
 }

@@ -13,21 +13,19 @@ management:
 
 spring:
   application:
-    name: lab-investimento
+    name: lab-investmento
   datasource:
     url: jdbc:h2:mem:lab_investment;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false
     username: sa
     password: password
-    jpa:
-      database: h2
-      hibernate:
-        ddl-auto: create
-      defer-datasource-initialization: true
-    h2:
-      console:
-        enabled: true
-
-
+  jpa:
+    database: h2
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
 
 lab:
   investment:
