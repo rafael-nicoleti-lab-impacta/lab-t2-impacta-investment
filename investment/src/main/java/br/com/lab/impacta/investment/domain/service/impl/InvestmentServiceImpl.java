@@ -1,5 +1,6 @@
 package br.com.lab.impacta.investment.domain.service.impl;
 
+import br.com.lab.impacta.investment.domain.event.InvestmentDoneEvent;
 import br.com.lab.impacta.investment.domain.exception.InvestmentAccountIsNotDebitException;
 import br.com.lab.impacta.investment.domain.exception.InvestmentAccountWithoutBalanceException;
 import br.com.lab.impacta.investment.domain.exception.InvestmentAccountWithoutBalanceForProductPrivateException;
@@ -9,6 +10,7 @@ import br.com.lab.impacta.investment.domain.model.Product;
 import br.com.lab.impacta.investment.domain.service.InvestmentService;
 import br.com.lab.impacta.investment.domain.service.facade.AccountFacade;
 import br.com.lab.impacta.investment.domain.service.facade.valueObject.AccountBalanceVO;
+import br.com.lab.impacta.investment.infrastructure.messaging.InvestmentSender;
 import br.com.lab.impacta.investment.infrastructure.repository.InvestmentRepository;
 import br.com.lab.impacta.investment.infrastructure.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class InvestmentServiceImpl implements InvestmentService {
 
     @Autowired
     private AccountFacade accountFacade;
+
+    @Autowired
+    private InvestmentSender investmentSender;
 
     @Value("${lab.investment.exceptions.product-dont-exists-message}")
     private String messageExceptionProductNotFound;
@@ -77,14 +82,19 @@ public class InvestmentServiceImpl implements InvestmentService {
                     messageExceptionAccountWithoutBalanceForProductPrivate,
                     descriptionExceptionAccountWithoutBalanceForProductPrivate);
 
-        boolean isDebited = accountFacade.debitAccount(accountId, valueInvestment);
-
-        if (!isDebited)
-            throw new InvestmentAccountIsNotDebitException(
-                    messageExceptionAccountIfNotDebited,
-                    descriptionExceptionAccountIfNotDebited);
+//        boolean isDebited = accountFacade.debitAccount(accountId, valueInvestment);
+//
+//        if (!isDebited)
+//            throw new InvestmentAccountIsNotDebitException(
+//                    messageExceptionAccountIfNotDebited,
+//                    descriptionExceptionAccountIfNotDebited);
 
         investmentRepository.save(investment);
+
+        investmentSender.sendEventInvestmentDone(
+                new InvestmentDoneEvent(investment.getId(),
+                        accountId,
+                        valueInvestment));
 
         return investment;
     }
